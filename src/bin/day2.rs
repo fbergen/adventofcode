@@ -18,20 +18,12 @@ pub fn main() {
 
     println!(
         "Num valid part 1: {}",
-        input
-            .iter()
-            .filter(|p| validate_password_part1(&p))
-            .into_iter()
-            .count()
+        input.iter().filter(|p| validate_password_part1(&p)).count()
     );
 
     println!(
         "Num valid part 2: {}",
-        input
-            .into_iter()
-            .filter(|p| validate_password_part2(&p))
-            .into_iter()
-            .count()
+        input.iter().filter(|p| validate_password_part2(&p)).count()
     );
 }
 
