@@ -11,7 +11,7 @@ pub struct PasswordPolicy {
 }
 
 pub fn main() {
-    let input: Vec<&str> = include_str!("..//inputs/day2").lines().collect();
+    let input: Vec<&str> = include_str!("../inputs/day2").lines().collect();
 
     println!(
         "Num valid part 1: {}",
