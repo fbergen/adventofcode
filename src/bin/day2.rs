@@ -11,14 +11,16 @@ pub struct PasswordPolicy {
 }
 
 pub fn main() {
-    let input: Vec<&str> = include_str!("../inputs/day2").lines().collect();
+    let input: Vec<PasswordPolicy> = include_str!("../inputs/day2")
+        .lines()
+        .map(|p| p.parse::<PasswordPolicy>().unwrap())
+        .collect();
 
     println!(
         "Num valid part 1: {}",
         input
             .iter()
-            .map(|p| p.parse::<PasswordPolicy>().unwrap())
-            .filter(|p| validate_password_part1(p))
+            .filter(|p| validate_password_part1(&p))
             .into_iter()
             .count()
     );
@@ -27,8 +29,7 @@ pub fn main() {
         "Num valid part 2: {}",
         input
             .into_iter()
-            .map(|p| p.parse::<PasswordPolicy>().unwrap())
-            .filter(|p| validate_password_part2(p))
+            .filter(|p| validate_password_part2(&p))
             .into_iter()
             .count()
     );
