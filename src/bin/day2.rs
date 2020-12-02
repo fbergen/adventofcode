@@ -29,14 +29,10 @@ pub fn main() {
 
 pub fn validate_password_part1(p: &PasswordPolicy) -> bool {
     let num: usize = p.pass.chars().filter(|c| *c == p.c).count();
-    let ret = num >= p.min && num <= p.max;
-    // println!("{:?}, {}, {}", p, num, ret);
-    ret
+    num >= p.min && num <= p.max
 }
 
 pub fn validate_password_part2(p: &PasswordPolicy) -> bool {
-    let ret = (p.pass.chars().nth(p.min - 1).unwrap() == p.c)
-        ^ (p.pass.chars().nth(p.max - 1).unwrap() == p.c);
-    // println!("{:?}, {}", p, ret);
-    ret
+    (p.pass.chars().nth(p.min - 1).unwrap() == p.c)
+        ^ (p.pass.chars().nth(p.max - 1).unwrap() == p.c)
 }
