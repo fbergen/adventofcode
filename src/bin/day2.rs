@@ -1034,7 +1034,7 @@ pub fn main() {
 pub fn validate_password_part1(p: &PasswordPolicy) -> bool {
     let num: usize = p.pass.chars().filter(|c| *c == p.c).count();
     let ret = num >= p.min && num <= p.max;
-    // println!("{:?}, {}", p, ret);
+    // println!("{:?}, {}, {}", p, num, ret);
     ret
 }
 
