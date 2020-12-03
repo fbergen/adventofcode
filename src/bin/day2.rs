@@ -17,12 +17,8 @@ pub fn main() {
         .collect();
 
     println!(
-        "Num valid part 1: {}",
-        input.iter().filter(|p| validate_password_part1(&p)).count()
-    );
-
-    println!(
-        "Num valid part 2: {}",
+        "Num valid\npart 1: {}\npart 2: {}",
+        input.iter().filter(|p| validate_password_part1(&p)).count(),
         input.iter().filter(|p| validate_password_part2(&p)).count()
     );
 }
