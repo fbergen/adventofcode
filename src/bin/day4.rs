@@ -1,12 +1,24 @@
 #[macro_use]
 extern crate lazy_static;
 
+use recap::Recap;
 use regex::Regex;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::str::FromStr;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Recap)]
+#[recap(regex = r"(?x)^
+    ((
+        (byr:(?P<byr>[^\s\n]+))|
+        (iyr:(?P<iyr>[^\s\n]+))|
+        (eyr:(?P<eyr>[^\s\n]+))|
+        (hgt:(?P<hgt>[^\s\n]+))|
+        (hcl:(?P<hcl>[^\s\n]+))|
+        (ecl:(?P<ecl>[^\s\n]+))|
+        (pid:(?P<pid>[^\s\n]+))|
+        (cid:(?P<cid>[^\s\n]+))
+    )[\s\n]*)+$")]
 pub struct PassportData {
     byr: String,         // (Birth Year)
     iyr: String,         // (Issue Year)
@@ -18,39 +30,10 @@ pub struct PassportData {
     cid: Option<String>, // (Country ID)
 }
 
-impl FromStr for PassportData {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        lazy_static! {
-            static ref RE: Regex = Regex::new(r"\b(?P<type>\w{3}):(?P<val>[^\n ]+)\b").unwrap();
-        }
-        let v: HashMap<String, String> = RE
-            .captures_iter(s)
-            .map(|c| (c["type"].to_string(), c["val"].to_string()))
-            .collect();
-
-        Ok(PassportData {
-            byr: v.get("byr").ok_or_else(|| "Err parsing")?.clone(),
-            iyr: v.get("iyr").ok_or_else(|| "Err parsing")?.clone(),
-            eyr: v.get("eyr").ok_or_else(|| "Err parsing")?.clone(),
-            hgt: v.get("hgt").ok_or_else(|| "Err parsing")?.clone(),
-            hcl: v.get("hcl").ok_or_else(|| "Err parsing")?.clone(),
-            ecl: v.get("ecl").ok_or_else(|| "Err parsing")?.clone(),
-            pid: v.get("pid").ok_or_else(|| "Err parsing")?.clone(),
-            cid: match v.get("cid") {
-                Some(x) => Some(x.clone()),
-                _ => None,
-            },
-        })
-    }
-}
-
 pub fn main() {
     let input: Vec<PassportData> = include_str!("../inputs/day4")
         .split("\n\n")
-        .map(|p| p.parse::<PassportData>())
-        .filter_map(Result::ok)
+        .filter_map(|p| p.parse::<PassportData>().ok())
         .collect();
 
     let part1 = input.len();
