@@ -4,8 +4,6 @@ extern crate lazy_static;
 use recap::Recap;
 use regex::Regex;
 use serde::Deserialize;
-use std::collections::HashMap;
-use std::str::FromStr;
 
 #[derive(Debug, Deserialize, Recap)]
 #[recap(regex = r"(?x)^
@@ -41,8 +39,7 @@ pub fn main() {
     let part2 = input
         .into_iter()
         .filter(validate_passport_data_part2)
-        .collect::<Vec<PassportData>>()
-        .len();
+        .count();
 
     println!("Num valid\npart 1: {:?}\npart 2: {:?}", part1, part2);
 }
