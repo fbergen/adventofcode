@@ -1,5 +1,5 @@
 pub fn main() {
-    let mut ids: Vec<u64> = include_str!("../inputs/day5")
+    let ids: Vec<u64> = include_str!("../inputs/day5")
         .lines()
         .map(|s| {
             u64::from_str_radix(
@@ -12,15 +12,11 @@ pub fn main() {
             .unwrap()
         })
         .collect();
-    println!("part1 {:?}", ids.iter().max().unwrap());
+    let (min, max) = (*ids.iter().min().unwrap(), *ids.iter().max().unwrap());
 
-    ids.sort();
     println!(
-        "part2 {:?}",
-        ids.iter()
-            .zip((*ids.first().unwrap())..)
-            .find(|(id, i)| *id != i)
-            .unwrap()
-            .1
+        "answ part1 {:?}, part2 {:?}",
+        max,
+        (min..=max).sum::<u64>() - ids.iter().sum::<u64>()
     );
 }
