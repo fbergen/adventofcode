@@ -96,11 +96,7 @@ fn solve(input_str: &str, part1: bool) -> i32 {
     let p = Program {
         pc: 0,
         acc: 0,
-        visited: {
-            let mut v = Vec::<bool>::new();
-            v.resize(input.len(), false);
-            v
-        },
+        visited: vec![false; input.len()],
         instr: &input,
         has_swapped: part1,
     };
