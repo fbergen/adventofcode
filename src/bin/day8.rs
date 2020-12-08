@@ -57,9 +57,6 @@ impl Iterator for Program<'_> {
             };
 
             if let Some(a) = alt_pc {
-                if a >= self.instr.len() {
-                    return Some((true, self.acc));
-                }
                 // Swap the jmp and nop instuction, evalutate the new program.
                 let alt_prg = Program {
                     pc: a,
