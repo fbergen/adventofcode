@@ -2,8 +2,8 @@ use itertools::Itertools;
 
 fn main() {
     let input: &str = include_str!("../inputs/day9");
-    println!("{:?}", part1(input, 25));
-    println!("{:?}", part2(input, part1(input, 25) as isize));
+    println!("part 1 {:?}", part1(input, 25));
+    println!("part 2 {:?}", part2(input, part1(input, 25) as isize));
 }
 
 fn part1(input_str: &str, window_size: usize) -> usize {
@@ -29,24 +29,22 @@ fn part2(input_str: &str, target: isize) -> isize {
         .lines()
         .map(|p| p.parse::<isize>().expect(&format!("Parse error {:?}", p)))
         .collect();
-
-    let mut longest_ans: Vec<isize> = Vec::new();
     for i in 0..input.len() {
         let mut sum: isize = 0;
-        let v: Vec<isize> = input[i..input.len()]
+        let v: Vec<&isize> = input[i..input.len()]
             .iter()
             .take_while(|n| {
                 sum += **n;
                 sum <= target
             })
-            .cloned()
             .collect();
 
-        if v.len() > longest_ans.len() && v.iter().sum::<isize>() == target {
-            longest_ans = v;
+        // Sum it up and check if exactly target,
+        if v.iter().fold(0, |x, y| x + *y) == target {
+            return **v.iter().min().unwrap() + **v.iter().max().unwrap();
         }
     }
-    return longest_ans.iter().min().unwrap() + longest_ans.iter().max().unwrap();
+    panic!("No seq found");
 }
 
 #[cfg(test)]
