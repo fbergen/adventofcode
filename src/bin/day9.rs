@@ -1,5 +1,3 @@
-use itertools::Itertools;
-
 fn main() {
     let input: &str = include_str!("../inputs/day9");
     println!("part 1 {:?}", part1(input, 25));
@@ -13,15 +11,23 @@ fn part1(input_str: &str, window_size: usize) -> usize {
         .collect();
 
     for i in window_size..input.len() {
-        if !input[i - window_size..i]
-            .iter()
-            .permutations(2)
-            .any(|x| x[0] + x[1] == input[i])
-        {
+        if !pair_sum(&input[i - window_size..i], input[i]) {
             return input[i];
         }
     }
     panic!("No errors!");
+}
+
+fn pair_sum(v: &[usize], target: usize) -> bool {
+    for i in 0..v.len() {
+        let iv = v[i];
+        for j in i..v.len() {
+            if iv + v[j] == target {
+                return true;
+            }
+        }
+    }
+    false
 }
 
 fn part2(input_str: &str, target: isize) -> isize {
