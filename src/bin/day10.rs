@@ -31,8 +31,9 @@ fn part2(input_str: &str) -> Option<usize> {
     // Add a zero element
     input.push(0);
     input.sort();
-    // Add the last element
-    input.push(input.last()? + 3);
+    // Note: We don't have to add the last element, as it doesn't change the number of
+    // combinations.
+    // input.push(input.last()? + 3);
 
     let mut c: Vec<usize> = vec![0; input.len()];
     // There is 1 way to get to 0 jolts.
@@ -40,19 +41,13 @@ fn part2(input_str: &str) -> Option<usize> {
     for i in 1..input.len() {
         let curr = input[i];
 
-        c[i] = if curr <= input[i - 1] + 3 {
-            c[i - 1]
-        } else {
-            0
-        } + if i >= 2 && curr <= input[i - 2] + 3 {
-            c[i - 2]
-        } else {
-            0
-        } + if i >= 3 && curr <= input[i - 3] + 3 {
-            c[i - 3]
-        } else {
-            0
-        };
+        c[i] = (1..=3).fold(0, |acc, x| {
+            acc + if i >= x && curr <= input[i - x] + 3 {
+                c[i - x]
+            } else {
+                0
+            }
+        });
     }
 
     Some(c[input.len() - 1])
