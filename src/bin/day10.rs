@@ -41,6 +41,7 @@ fn part2(input_str: &str) -> Option<usize> {
     for i in 1..input.len() {
         let curr = input[i];
 
+        // Try-sum the combinations for the three previous adapters
         c[i] = (1..=3).fold(0, |acc, x| {
             acc + if i >= x && curr <= input[i - x] + 3 {
                 c[i - x]
