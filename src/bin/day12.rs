@@ -20,7 +20,6 @@ fn solve(input_str: &str, part1: bool) -> isize {
         .map(|p| p.parse::<Instr>().unwrap())
         .collect();
 
-    println!("{:?}", instrs);
     let mut dir = if part1 { (1, 0) } else { (10, 1) };
     let mut pos = (0, 0);
 
@@ -61,6 +60,10 @@ fn solve(input_str: &str, part1: bool) -> isize {
 fn rot((x, y): (isize, isize), deg: isize) -> (isize, isize) {
     let rot = [
         [
+            [1, 0], // 0deg
+            [0, 1],
+        ],
+        [
             [0, -1], // 90deg
             [1, 0],
         ],
@@ -73,12 +76,8 @@ fn rot((x, y): (isize, isize), deg: isize) -> (isize, isize) {
             [-1, 0],
         ],
     ];
-    let r = ((deg + 360) / 90) as usize % 4;
-    if r == 0 {
-        // 0 or 360 degree is Noop
-        return (x, y);
-    }
-    let m = rot[r - 1];
+    let r = ((deg.rem_euclid(360)) / 90) as usize % 4;
+    let m = rot[r];
 
     return (x * m[0][0] + y * m[0][1], x * m[1][0] + y * m[1][1]);
 }
