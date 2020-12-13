@@ -29,7 +29,7 @@ fn part1(input_str: &str) -> usize {
     lowest_wait * first_b
 }
 
-fn egcd(a: i64, b: i64) -> i64 {
+fn bezout(a: i64, b: i64) -> i64 {
     let (mut old_r, mut r) = (a, b);
     let (mut old_s, mut s) = (1, 0);
 
@@ -54,7 +54,7 @@ fn chinese_remainder(vals: Vec<(i64, i64)>) -> i64 {
 
     for (a, n) in vals {
         let q = prod / n;
-        sum += -a * egcd(q, n) * q
+        sum += -a * bezout(q, n) * q
     }
 
     sum.rem_euclid(prod)
