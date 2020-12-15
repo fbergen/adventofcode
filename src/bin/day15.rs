@@ -13,7 +13,7 @@ fn solve(input_str: &str, turns: usize) -> usize {
         .collect();
 
     // let mut num_to_turn: HashMap<usize, usize> = HashMap::new();
-    let mut num_to_turn: Vec<usize> = vec![0; 100000000];
+    let mut num_to_turn: Vec<usize> = vec![0; 30000000];
 
     let mut turn = 1;
     let mut last_spoken = 0;
