@@ -23,11 +23,12 @@ fn solve(input_str: &str, turns: usize) -> usize {
     let mut to_speak: usize = 0;
 
     for turn in turn..=turns {
-        to_speak = match num_to_turn[last_spoken] {
+        let prev: &mut usize = &mut num_to_turn[last_spoken];
+        to_speak = match *prev {
             0 => 0,
             x => turn - x - 1,
         };
-        num_to_turn[last_spoken] = turn - 1;
+        *prev = turn - 1;
         // println!("{}: last {}, now {}", turn, last_spoken, to_speak);
         last_spoken = to_speak;
     }
