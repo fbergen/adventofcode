@@ -1,5 +1,3 @@
-// use std::collections::HashMap;
-
 fn main() {
     let input: &str = "1,2,16,19,18,0";
     println!("part1: {}", solve(input, 2020));
@@ -12,27 +10,19 @@ fn solve(input_str: &str, turns: usize) -> usize {
         .map(|p| p.parse::<usize>().unwrap())
         .collect();
 
-    // let mut num_to_turn: HashMap<usize, usize> = HashMap::new();
-    let mut num_to_turn: Vec<usize> = vec![0; 30000000];
+    let mut num_to_turn: Vec<usize> = vec![0; turns];
 
     let mut turn = 1;
     let mut last_spoken = 0;
     for v in starting_nums {
-        // num_to_turn.insert(v, turn);
         num_to_turn[v] = turn;
         turn += 1;
         last_spoken = v;
     }
-    // num_to_turn.remove(&last_spoken);
     num_to_turn[last_spoken] = 0;
     let mut to_speak: usize = 0;
 
     for turn in turn..=turns {
-        // to_speak = match num_to_turn.get(&last_spoken) {
-        //     Some(x) => turn - x - 1,
-        //     None => 0,
-        // };
-        // num_to_turn.insert(last_spoken, turn - 1);
         to_speak = match num_to_turn[last_spoken] {
             0 => 0,
             x => turn - x - 1,
