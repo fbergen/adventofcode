@@ -1,7 +1,7 @@
 fn main() {
     let input: &str = "1,2,16,19,18,0";
     println!("part1: {}", solve(input, 2020));
-    println!("part2: {}", solve(input, 30000000));
+    println!("part2: {}", solve(input, 30_000_000));
 }
 
 fn solve(input_str: &str, turns: usize) -> usize {
@@ -41,7 +41,7 @@ mod test {
 
     #[test]
     fn test_day15() {
-        assert_eq!(solve("0,3,6", true), 436);
-        assert_eq!(solve("1,3,2", true), 1);
+        assert_eq!(solve("0,3,6", 2020), 436);
+        assert_eq!(solve("1,3,2", 30_000_000), 1);
     }
 }
