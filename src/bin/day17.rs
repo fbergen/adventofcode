@@ -59,6 +59,9 @@ fn new_val2(map: &Map2, x: isize, y: isize, z: isize, w: isize) -> bool {
     let v = *map.get(&(x, y, z, w)).unwrap_or(&false);
 
     let mut active_neigbors = 0;
+    if v {
+        active_neigbors -= 1;
+    }
 
     for ix in x - 1..=x + 1 {
         for iy in y - 1..=y + 1 {
@@ -68,12 +71,20 @@ fn new_val2(map: &Map2, x: isize, y: isize, z: isize, w: isize) -> bool {
                         active_neigbors += 1;
                     }
                 }
+                if active_neigbors > 3 {
+                    break;
+                }
             }
+            if active_neigbors > 3 {
+                break;
+            }
+        }
+        if active_neigbors > 3 {
+            break;
         }
     }
     if v {
-        // I count the node itself too, hence inc by one on req.
-        return active_neigbors == 3 || active_neigbors == 4;
+        return active_neigbors == 2 || active_neigbors == 3;
     }
     active_neigbors == 3
 }
