@@ -11,6 +11,8 @@ debug = true
 [dependencies]
 recap = "0.1"
 serde = { version = "1.0", features = ["derive"] }
+parse-display = "0.4"
 regex = "1"
+pcre2 = "0.1"
 lazy_static = "1.4.0"
 itertools = "0.9.0"
