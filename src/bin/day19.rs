@@ -47,29 +47,22 @@ fn solve(input_str: &str, part1: bool) -> Option<usize> {
     .unwrap();
 
     let messages: Vec<&str> = sect.next()?.lines().collect();
-
-    // return matches
     Some(
         messages
             .iter()
-            .filter(|m| re.is_match(m.as_bytes()).ok().unwrap())
+            .filter(|m| re.is_match(m.as_bytes()).unwrap())
             .count(),
     )
 }
 
 fn get_re(rules: &HashMap<usize, String>, id: usize) -> String {
-    let rule = &rules[&id];
-
     lazy_static! {
         static ref RE: Regex = Regex::new(r"(\d+)").unwrap();
     }
 
     return RE
-        .replace_all(rule, |caps: &Captures| {
-            format!(
-                "({})",
-                get_re(rules, caps[1].parse::<usize>().ok().unwrap())
-            )
+        .replace_all(&rules[&id], |c: &Captures| {
+            format!("({})", get_re(rules, c[1].parse::<usize>().ok().unwrap()))
         })
         .to_string();
 }
