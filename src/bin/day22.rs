@@ -76,20 +76,15 @@ fn solve(input_str: &str, part1: bool) -> Option<usize> {
         is_p1_winner(&mut p1_deck, &mut p2_deck);
     }
 
-    Some(
-        p1_deck
-            .iter()
+    let score = |x: &VecDeque<usize>| {
+        x.iter()
             .rev()
             .enumerate()
             .map(|(i, x)| (i + 1) * x)
             .sum::<usize>()
-            + p2_deck
-                .iter()
-                .rev()
-                .enumerate()
-                .map(|(i, x)| (i + 1) * x)
-                .sum::<usize>(),
-    )
+    };
+
+    Some(score(&p1_deck) + score(&p2_deck))
 }
 
 #[cfg(test)]
