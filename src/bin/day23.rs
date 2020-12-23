@@ -1,5 +1,3 @@
-use std::collections::{HashSet, VecDeque};
-
 fn main() {
     let input = "589174263";
     println!("part1: {}", solve(input, true, 100).unwrap());
@@ -7,73 +5,75 @@ fn main() {
 }
 
 fn solve(input_str: &str, part1: bool, iter: usize) -> Option<String> {
-    let mut cards: Vec<i32> = input_str
+    let cards: Vec<usize> = input_str
         .chars()
-        .map(|d| d.to_digit(10).unwrap() as i32)
+        .map(|d| d.to_digit(10).unwrap() as usize)
         .collect();
 
-    if !part1 {
-        for i in 10..=1_000_000 {
-            cards.push(i);
+    let len = if part1 { cards.len() } else { 1_000_000 };
+    let mut prev = if part1 { *cards.last().unwrap() } else { len };
+    // card_[num] = (prev, next)
+    let mut card_ll: Vec<(usize, usize)> = vec![(0, 0); len + 1];
+
+    // Build LinkedList
+    for i in 0..len {
+        let cur = *cards.get(i).unwrap_or(&(i + 1));
+        let mut next = *cards.get(i + 1).unwrap_or(&(i + 2));
+        if next > len {
+            next = cards[0];
         }
+
+        card_ll[cur] = (prev, next);
+        prev = cur;
     }
-    let len = cards.len() as i32;
 
-    let mut curri = 0;
-    for i in 0..iter {
-        if i % 10_000 == 0 {
-            println!("it: {}", i)
-        }
-        let curr: i32 = cards[curri % len as usize];
+    let mut cur = cards[0];
 
-        // println!("Move {}, curr: {}", i + 1, curr);
-        // println!("Cups {:?}", cards);
-        let to_move: Vec<i32> = (0..3)
-            .map(|idx| {
-                let mv = cards.remove((curri + 1) % cards.len());
-                if curri >= cards.len() {
-                    curri -= 1;
-                }
-                mv
-            })
-            .collect();
+    for _ in 0..iter {
+        let mut to_move: Vec<usize> = vec![];
+        to_move.push(card_ll[cur].1);
+        to_move.push(card_ll[*to_move.last().unwrap()].1);
+        to_move.push(card_ll[*to_move.last().unwrap()].1);
 
-        // println!("Pick up {:?}", to_move);
-        let dst = {
-            let mut destination: i32 = -1;
-            for j in 1..6 {
-                if curr - j == 0 {
-                    continue;
-                }
-                if !to_move.contains(&(curr - j).rem_euclid(len + 1)) {
-                    destination = (curr - j).rem_euclid(len + 1);
-                    break;
-                }
+        let mut dst: usize = 0;
+        for j in 1..6 {
+            if cur - j == 0 {
+                continue;
             }
-
-            cards.iter().position(|&x| x == destination).unwrap() + 1
-        };
-
-        cards.splice(dst..dst, to_move.iter().cloned());
-        if dst <= curri {
-            curri += 3;
+            let d = (cur as i32 - j as i32).rem_euclid((len + 1) as i32) as usize;
+            if !to_move.contains(&d) {
+                dst = d;
+                break;
+            }
         }
 
-        curri = (curri + 1) % cards.len();
+        // LinkedList remove then issert
+        let before_to_move = card_ll[*to_move.first().unwrap()].0;
+        let after_to_move = card_ll[*to_move.last().unwrap()].1;
+        card_ll[before_to_move].1 = after_to_move;
+        card_ll[after_to_move].0 = before_to_move;
+
+        let after_dst = card_ll[dst].1;
+        card_ll[dst].1 = *to_move.first().unwrap();
+        card_ll[after_dst].0 = *to_move.last().unwrap();
+        card_ll[*to_move.first().unwrap()].0 = dst;
+        card_ll[*to_move.last().unwrap()].1 = after_dst;
+
+        cur = card_ll[cur].1;
     }
-    //  println!("Final {:?}", cards);
-    let one_pos = cards.iter().position(|&x| x == 1).unwrap();
-    cards.rotate_left(one_pos);
+
     if part1 {
-        Some(
-            cards
-                .iter()
-                .skip(1)
-                .fold("".to_string(), |acc, x| format!("{}{}", acc, x)),
-        )
+        let mut cur = 1;
+        let ret = (1..len).fold("".to_string(), |acc, _| {
+            cur = card_ll[cur].1;
+            acc + &cur.to_string()
+        });
+
+        Some(ret)
     } else {
-        println!("Final {:?}, {:?}", cards[1], cards[2]);
-        Some((cards[1] * cards[2]).to_string())
+        let first = card_ll[1].1;
+        let second = card_ll[first].1;
+        Some((first * second).to_string())
     }
 }
 
@@ -88,6 +88,5 @@ mod test {
         assert_eq!(solve(TESTCASE, true, 10).unwrap(), "92658374");
         assert_eq!(solve(TESTCASE, true, 100).unwrap(), "67384529");
         assert_eq!(solve(TESTCASE, false, 10_000_000).unwrap(), "149245887792");
-        // assert_eq!(solve(TESTCASE, false).unwrap(), 291);
     }
 }
