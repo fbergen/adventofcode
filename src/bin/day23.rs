@@ -11,9 +11,8 @@ fn solve(input_str: &str, part1: bool, iter: usize) -> Option<String> {
         .collect();
 
     let len = if part1 { cards.len() } else { 1_000_000 };
-    let mut prev = if part1 { *cards.last().unwrap() } else { len };
-    // card_[num] = (prev, next)
-    let mut card_ll: Vec<(usize, usize)> = vec![(0, 0); len + 1];
+    // card_[num] = next
+    let mut card_ll: Vec<usize> = vec![0; len + 1];
 
     // Build LinkedList
     for i in 0..len {
@@ -23,17 +22,16 @@ fn solve(input_str: &str, part1: bool, iter: usize) -> Option<String> {
             next = cards[0];
         }
 
-        card_ll[cur] = (prev, next);
-        prev = cur;
+        card_ll[cur] = next;
     }
 
     let mut cur = cards[0];
 
     for _ in 0..iter {
         let mut to_move: Vec<usize> = vec![];
-        to_move.push(card_ll[cur].1);
-        to_move.push(card_ll[*to_move.last().unwrap()].1);
-        to_move.push(card_ll[*to_move.last().unwrap()].1);
+        to_move.push(card_ll[cur]);
+        to_move.push(card_ll[*to_move.last()?]);
+        to_move.push(card_ll[*to_move.last()?]);
 
         let mut dst: usize = 0;
         for j in 1..6 {
@@ -47,32 +45,28 @@ fn solve(input_str: &str, part1: bool, iter: usize) -> Option<String> {
             }
         }
 
-        // LinkedList remove then issert
-        let before_to_move = card_ll[*to_move.first().unwrap()].0;
-        let after_to_move = card_ll[*to_move.last().unwrap()].1;
-        card_ll[before_to_move].1 = after_to_move;
-        card_ll[after_to_move].0 = before_to_move;
+        // LinkedList remove
+        card_ll[cur] = card_ll[to_move[2]];
 
-        let after_dst = card_ll[dst].1;
-        card_ll[dst].1 = *to_move.first().unwrap();
-        card_ll[after_dst].0 = *to_move.last().unwrap();
-        card_ll[*to_move.first().unwrap()].0 = dst;
-        card_ll[*to_move.last().unwrap()].1 = after_dst;
+        // Insert to_move list
+        card_ll[to_move[2]] = card_ll[dst];
+        card_ll[dst] = to_move[0];
 
-        cur = card_ll[cur].1;
+        // Iterate cur
+        cur = card_ll[cur];
     }
 
     if part1 {
         let mut cur = 1;
         let ret = (1..len).fold("".to_string(), |acc, _| {
-            cur = card_ll[cur].1;
+            cur = card_ll[cur];
             acc + &cur.to_string()
         });
 
         Some(ret)
     } else {
-        let first = card_ll[1].1;
-        let second = card_ll[first].1;
+        let first = card_ll[1];
+        let second = card_ll[first];
         Some((first * second).to_string())
     }
 }
