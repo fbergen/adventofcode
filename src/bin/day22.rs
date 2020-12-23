@@ -51,13 +51,13 @@ fn solve(input_str: &str, part1: bool) -> Option<usize> {
         .next()?
         .lines()
         .skip(1)
-        .map(|l| usize::from_str_radix(l, 10).unwrap())
+        .map(|l| l.parse::<usize>().unwrap())
         .collect();
     let mut p2_deck: VecDeque<usize> = sect
         .next()?
         .lines()
         .skip(1)
-        .map(|l| usize::from_str_radix(l, 10).unwrap())
+        .map(|l| l.parse::<usize>().unwrap())
         .collect();
 
     if part1 {
