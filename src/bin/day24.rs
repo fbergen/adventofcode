@@ -25,7 +25,7 @@ fn main() {
     println!("part2: {}", solve(input, false));
 }
 
-fn move_tile(row: isize, col: isize, d: &Dir) -> (isize, isize) {
+fn mv_tile(row: isize, col: isize, d: &Dir) -> (isize, isize) {
     let mut nrow = row;
     let mut ncol = col;
 
@@ -68,10 +68,7 @@ fn solve(input_str: &str, part1: bool) -> usize {
 
     let mut tile_map: HashMap<(isize, isize), bool> = HashMap::new();
     for t in tiles {
-        let coord = t
-            .dir
-            .iter()
-            .fold((0, 0), |acc, x| move_tile(acc.0, acc.1, x));
+        let coord = t.dir.iter().fold((0, 0), |acc, x| mv_tile(acc.0, acc.1, x));
 
         *tile_map.entry(coord).or_insert(false) ^= true;
     }
@@ -79,38 +76,29 @@ fn solve(input_str: &str, part1: bool) -> usize {
         return tile_map.values().filter(|&&x| x).count();
     }
 
+    let mut neighbor_black: HashMap<(isize, isize), usize> = HashMap::new();
     for _ in 0..100 {
-        let mut neighbor_black: HashMap<(isize, isize), usize> = HashMap::new();
-        tile_map.iter().for_each(|((r, c), v)| {
-            let inc = if *v { 1 } else { 0 };
-            neighbor_black.entry((*r, *c)).or_insert(0);
-            *neighbor_black
-                .entry(move_tile(*r, *c, &Dir::E))
-                .or_insert(0) += inc;
-            *neighbor_black
-                .entry(move_tile(*r, *c, &Dir::SE))
-                .or_insert(0) += inc;
-            *neighbor_black
-                .entry(move_tile(*r, *c, &Dir::SW))
-                .or_insert(0) += inc;
-            *neighbor_black
-                .entry(move_tile(*r, *c, &Dir::W))
-                .or_insert(0) += inc;
-            *neighbor_black
-                .entry(move_tile(*r, *c, &Dir::NW))
-                .or_insert(0) += inc;
-            *neighbor_black
-                .entry(move_tile(*r, *c, &Dir::NE))
-                .or_insert(0) += inc;
-        });
-        neighbor_black.iter().for_each(|(coord, &num)| {
-            if *tile_map.get(coord).unwrap_or(&false) {
+        tile_map
+            .iter()
+            .filter(|(_, v)| **v)
+            .for_each(|((r, c), _)| {
+                neighbor_black.entry((*r, *c)).or_insert(0);
+                *neighbor_black.entry(mv_tile(*r, *c, &Dir::E)).or_insert(0) += 1;
+                *neighbor_black.entry(mv_tile(*r, *c, &Dir::SE)).or_insert(0) += 1;
+                *neighbor_black.entry(mv_tile(*r, *c, &Dir::SW)).or_insert(0) += 1;
+                *neighbor_black.entry(mv_tile(*r, *c, &Dir::W)).or_insert(0) += 1;
+                *neighbor_black.entry(mv_tile(*r, *c, &Dir::NW)).or_insert(0) += 1;
+                *neighbor_black.entry(mv_tile(*r, *c, &Dir::NE)).or_insert(0) += 1;
+            });
+
+        neighbor_black.drain().for_each(|(coord, num)| {
+            if *tile_map.get(&coord).unwrap_or(&false) {
                 if num == 0 || num > 2 {
-                    tile_map.insert(*coord, false);
+                    tile_map.insert(coord, false);
                 }
             } else {
                 if num == 2 {
-                    tile_map.insert(*coord, true);
+                    tile_map.insert(coord, true);
                 }
             }
         });
