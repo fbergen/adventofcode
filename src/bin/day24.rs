@@ -12,6 +12,8 @@ pub enum Dir {
     NW,
     NE,
 }
+use Dir::*;
+static DIRS: [Dir; 6] = [E, SE, SW, W, NW, NE];
 
 #[derive(Debug, Deserialize, Recap)]
 #[recap(regex = r"^(?P<dir>.*)$")]
@@ -30,27 +32,15 @@ fn mv_tile(row: isize, col: isize, d: &Dir) -> (isize, isize) {
     let mut ncol = col;
 
     match d {
-        Dir::NE | Dir::NW => nrow -= 1,
-        Dir::SE | Dir::SW => nrow += 1,
-        _ => {}
+        NE | NW => nrow -= 1,
+        SE | SW => nrow += 1,
+        E => ncol += 1,
+        W => ncol -= 1,
     }
     match d {
-        Dir::E => ncol += 1,
-        Dir::W => ncol -= 1,
+        NW | SW if row % 2 == 0 => ncol -= 1, // even
+        NE | SE if row % 2 != 0 => ncol += 1, // odd
         _ => {}
-    }
-    if row % 2 == 0 {
-        // even
-        match d {
-            Dir::NW | Dir::SW => ncol -= 1,
-            _ => {}
-        }
-    } else {
-        // odd
-        match d {
-            Dir::NE | Dir::SE => ncol += 1,
-            _ => {}
-        }
     }
 
     (nrow, ncol)
@@ -83,12 +73,9 @@ fn solve(input_str: &str, part1: bool) -> usize {
             .filter(|(_, v)| **v)
             .for_each(|((r, c), _)| {
                 neighbor_black.entry((*r, *c)).or_insert(0);
-                *neighbor_black.entry(mv_tile(*r, *c, &Dir::E)).or_insert(0) += 1;
-                *neighbor_black.entry(mv_tile(*r, *c, &Dir::SE)).or_insert(0) += 1;
-                *neighbor_black.entry(mv_tile(*r, *c, &Dir::SW)).or_insert(0) += 1;
-                *neighbor_black.entry(mv_tile(*r, *c, &Dir::W)).or_insert(0) += 1;
-                *neighbor_black.entry(mv_tile(*r, *c, &Dir::NW)).or_insert(0) += 1;
-                *neighbor_black.entry(mv_tile(*r, *c, &Dir::NE)).or_insert(0) += 1;
+                for d in DIRS.iter() {
+                    *neighbor_black.entry(mv_tile(*r, *c, d)).or_insert(0) += 1;
+                }
             });
 
         neighbor_black.drain().for_each(|(coord, num)| {
