@@ -15,7 +15,7 @@ fn solve(input_str: &str, part1: bool) -> Option<usize> {
     }
 
     let iter = input.windows(3);
-    let w = iter.map(|x| x.iter().product()).collect();
+    let w = iter.map(|x| x.iter().sum()).collect();
 
     return Some(count_increasing(&w));
 }
