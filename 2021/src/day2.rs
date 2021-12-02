@@ -1,10 +1,18 @@
 use recap::Recap;
 use serde::Deserialize;
 
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
+enum Command {
+    Forward,
+    Down,
+    Up,
+}
+
 #[derive(Debug, Deserialize, Recap)]
 #[recap(regex = r"^(?P<op>\w+) (?P<arg>\d+)$")]
 pub struct Instr {
-    op: String,
+    op: Command,
     arg: usize,
 }
 
@@ -18,11 +26,10 @@ pub fn solve_part_1(input_str: &str) -> usize {
     let mut d: usize = 0;
 
     for i in instrs {
-        match i.op.as_ref() {
-            "forward" => h += i.arg,
-            "down" => d += i.arg,
-            "up" => d -= i.arg,
-            _ => panic!(),
+        match i.op {
+            Command::Forward => h += i.arg,
+            Command::Down => d += i.arg,
+            Command::Up => d -= i.arg,
         }
     }
     return h * d;
@@ -39,14 +46,13 @@ pub fn solve_part_2(input_str: &str) -> usize {
     let mut aim: usize = 0;
 
     for i in instrs {
-        match i.op.as_ref() {
-            "forward" => {
+        match i.op {
+            Command::Forward => {
                 h += i.arg;
                 d += aim * i.arg
             }
-            "down" => aim += i.arg,
-            "up" => aim -= i.arg,
-            _ => panic!(),
+            Command::Down => aim += i.arg,
+            Command::Up => aim -= i.arg,
         }
     }
     return h * d;
