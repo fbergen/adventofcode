@@ -1,23 +1,21 @@
-fn main() {
-    let input: &str = include_str!("../inputs/day1");
-    println!("part1: {}", solve(input, true).unwrap());
-    println!("part1: {}", solve(input, false).unwrap());
-}
-
-fn solve(input_str: &str, part1: bool) -> Option<usize> {
+pub fn solve_part_1(input_str: &str) -> usize {
     let input: Vec<usize> = input_str
         .lines()
         .map(|p| p.parse::<usize>().expect(&format!("Parse error {:?}", p)))
         .collect();
 
-    if part1 {
-        return Some(count_increasing(&input));
-    }
+    count_increasing(&input)
+}
+pub fn solve_part_2(input_str: &str) -> usize {
+    let input: Vec<usize> = input_str
+        .lines()
+        .map(|p| p.parse::<usize>().expect(&format!("Parse error {:?}", p)))
+        .collect();
 
     let iter = input.windows(3);
     let w = iter.map(|x| x.iter().sum()).collect();
 
-    return Some(count_increasing(&w));
+    count_increasing(&w)
 }
 
 fn count_increasing(input: &Vec<usize>) -> usize {
