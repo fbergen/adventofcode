@@ -51,3 +51,32 @@ pub fn solve_part_2(input_str: &str) -> usize {
     }
     return h * d;
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test1() {
+        let res = super::solve_part_1(
+            "forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2",
+        );
+        assert_eq!(res, 150);
+    }
+
+    #[test]
+    fn test2() {
+        let res = super::solve_part_2(
+            "forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2",
+        );
+        assert_eq!(res, 900);
+    }
+}
