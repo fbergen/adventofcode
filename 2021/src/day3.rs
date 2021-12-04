@@ -36,17 +36,15 @@ pub fn solve_part_1(input_str: &str) -> usize {
     gamma * epsilon
 }
 
-fn get_majority(list: Vec<&Vec<isize>>, inverse: bool) -> isize {
+fn get_majority(inp: Vec<&Vec<isize>>, inverse: bool) -> isize {
     let bit_len = list.first().unwrap().len();
-    let mut oxy: Vec<&Vec<isize>> = list.into_iter().collect();
+    let mut list: Vec<&Vec<isize>> = inp.into_iter().collect();
     for i in 0..bit_len {
-        let num_left = oxy.len();
-
-        if num_left == 1 {
+        if list.len() == 1 {
             break;
         }
         // majority of all bits at position x
-        let maj = oxy.iter().fold(vec![0; bit_len], |res, x| {
+        let maj = list.iter().fold(vec![0; bit_len], |res, x| {
             res.iter()
                 .zip(x.iter())
                 .map(|(&a, &b)| a + b * 2 - 1) // incrememt one for 1 and decrement for 0
@@ -60,10 +58,10 @@ fn get_majority(list: Vec<&Vec<isize>>, inverse: bool) -> isize {
         if inverse {
             pick ^= 1;
         }
-        oxy.retain(|x| x[i] == pick);
+        list.retain(|x| x[i] == pick);
     }
 
-    oxy.first()
+    list.first()
         .unwrap()
         .into_iter()
         .fold(0, |acc, x| acc * 2 + x)
