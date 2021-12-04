@@ -29,8 +29,12 @@ macro_rules! aoc {
 
 mod day1;
 mod day2;
+mod day3;
+mod day4;
 
 aoc! {
     1 => day1,
-    2 => day2
+    2 => day2,
+    3 => day3,
+    4 => day4
 }
