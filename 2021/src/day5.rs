@@ -34,7 +34,7 @@ pub fn solve_part_1(input_str: &str) -> usize {
     let lines: Vec<Line> = input_str
         .lines()
         .map(|l| l.parse::<Line>().unwrap())
-        .filter(|Line { x1, y1, x2, y2 }| x1 == x2 || y1 == y2)
+        .filter(|l| l.x1 == l.x2 || l.y1 == l.y2)
         .collect();
     solve(lines)
 }
