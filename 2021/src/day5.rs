@@ -1,6 +1,7 @@
 use recap::Recap;
 use serde::Deserialize;
 use std::collections::HashMap;
+use std::iter;
 
 #[derive(Debug, Deserialize, Recap)]
 #[recap(regex = r"^(?P<x1>\d+),(?P<y1>\d+) -> (?P<x2>\d+),(?P<y2>\d+)$")]
@@ -12,48 +13,47 @@ struct Line {
 }
 
 fn range(a: usize, b: usize) -> Box<dyn Iterator<Item = usize>> {
-    if a <= b {
+    if a < b {
         return Box::new(a..=b);
+    }
+    if a == b {
+        return Box::new(iter::repeat(a));
     }
     Box::new((b..=a).rev())
 }
 
 impl Line {
-    fn to_vec(&self, diag: bool) -> Vec<(usize, usize)> {
-        if self.x1 == self.x2 {
-            return range(self.y1, self.y2).map(|y| (self.x1, y)).collect();
-        } else if self.y1 == self.y2 {
-            return range(self.x1, self.x2).map(|x| (x, self.y1)).collect();
-        }
-        if diag {
-            return range(self.x1, self.x2)
-                .zip(range(self.y1, self.y2))
-                .collect();
-        }
-
-        vec![]
+    fn to_vec(&self) -> Vec<(usize, usize)> {
+        range(self.x1, self.x2)
+            .zip(range(self.y1, self.y2))
+            .collect()
     }
 }
 
 pub fn solve_part_1(input_str: &str) -> usize {
-    solve(input_str, false)
+    let lines: Vec<Line> = input_str
+        .lines()
+        .map(|l| l.parse::<Line>().unwrap())
+        .filter(|Line { x1, y1, x2, y2 }| x1 == x2 || y1 == y2)
+        .collect();
+    solve(lines)
 }
 
 pub fn solve_part_2(input_str: &str) -> usize {
-    solve(input_str, true)
+    let lines = input_str
+        .lines()
+        .map(|l| l.parse::<Line>().unwrap())
+        .collect();
+    solve(lines)
 }
 
-fn solve(input_str: &str, part2: bool) -> usize {
-    let lines = input_str.lines().map(|l| l.parse::<Line>().unwrap());
-
+fn solve(lines: Vec<Line>) -> usize {
     let mut points: HashMap<(usize, usize), usize> = HashMap::new();
-
-    lines.for_each(|l| {
-        l.to_vec(part2).iter().for_each(|p| {
+    lines.iter().for_each(|l| {
+        l.to_vec().iter().for_each(|p| {
             *points.entry(*p).or_insert(0) += 1;
         })
     });
-
     points.values().filter(|v| **v >= 2).count()
 }
 
