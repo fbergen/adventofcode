@@ -37,7 +37,7 @@ pub fn solve_part_1(input_str: &str) -> usize {
 }
 
 fn get_majority(inp: Vec<&Vec<isize>>, inverse: bool) -> isize {
-    let bit_len = list.first().unwrap().len();
+    let bit_len = inp.first().unwrap().len();
     let mut list: Vec<&Vec<isize>> = inp.into_iter().collect();
     for i in 0..bit_len {
         if list.len() == 1 {
