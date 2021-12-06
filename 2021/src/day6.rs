@@ -14,12 +14,11 @@ pub fn solve(input_str: &str, days: usize) -> usize {
         .split(",")
         .map(|x| x.parse::<usize>().unwrap());
 
-    let mut deq: VecDeque<usize> = VecDeque::from(vec![0; 9]);
+    let mut deq: VecDeque<usize> = VecDeque::from(vec![0; 9 + days]);
     inp.for_each(|x| deq[x] += 1);
 
     for _d in 0..days {
         let num_spawn = deq.pop_front().unwrap();
-        deq.resize_with(9, Default::default);
         deq[6] += num_spawn;
         deq[8] += num_spawn;
     }
