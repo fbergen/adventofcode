@@ -7,18 +7,15 @@ pub fn solve_part_2(input_str: &str) -> usize {
     solve(input_str, 256)
 }
 pub fn solve(input_str: &str, days: usize) -> usize {
-    let inp: Vec<usize> = input_str
+    let inp = input_str
         .lines()
         .next()
         .unwrap()
         .split(",")
-        .map(|x| x.parse::<usize>().unwrap())
-        .collect();
+        .map(|x| x.parse::<usize>().unwrap());
 
     let mut deq: VecDeque<usize> = VecDeque::from(vec![0; 9]);
-    inp.into_iter().for_each(|x| {
-        deq[x] += 1;
-    });
+    inp.for_each(|x| deq[x] += 1);
 
     for _d in 0..days {
         let num_spawn = deq.pop_front().unwrap();
