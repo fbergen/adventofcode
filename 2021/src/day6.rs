@@ -1,12 +1,9 @@
 use std::collections::VecDeque;
 
+const DAYS_1: usize = 80;
+const DAYS_2: usize = 256;
+
 pub fn solve_part_1(input_str: &str) -> usize {
-    solve(input_str, 80)
-}
-pub fn solve_part_2(input_str: &str) -> usize {
-    solve(input_str, 256)
-}
-pub fn solve(input_str: &str, days: usize) -> usize {
     let inp = input_str
         .lines()
         .next()
@@ -14,15 +11,33 @@ pub fn solve(input_str: &str, days: usize) -> usize {
         .split(",")
         .map(|x| x.parse::<usize>().unwrap());
 
-    let mut deq: VecDeque<usize> = VecDeque::from(vec![0; 9 + days]);
+    let mut deq = [0; 9 + DAYS_1];
     inp.for_each(|x| deq[x] += 1);
 
-    for _d in 0..days {
-        let num_spawn = deq.pop_front().unwrap();
-        deq[6] += num_spawn;
-        deq[8] += num_spawn;
+    for d in 0..DAYS_1 {
+        let num_spawn = deq[d];
+        deq[d + 7] += num_spawn;
+        deq[d + 9] += num_spawn;
     }
-    deq.iter().sum()
+    ((DAYS_1)..(DAYS_1 + 9)).map(|x| deq[x]).sum()
+}
+pub fn solve_part_2(input_str: &str) -> usize {
+    let inp = input_str
+        .lines()
+        .next()
+        .unwrap()
+        .split(",")
+        .map(|x| x.parse::<usize>().unwrap());
+
+    let mut deq = [0; 9 + DAYS_2];
+    inp.for_each(|x| deq[x] += 1);
+
+    for d in 0..DAYS_2 {
+        let num_spawn = deq[d];
+        deq[d + 7] += num_spawn;
+        deq[d + 9] += num_spawn;
+    }
+    ((DAYS_2)..(DAYS_2 + 9)).map(|x| deq[x]).sum()
 }
 
 #[cfg(test)]
