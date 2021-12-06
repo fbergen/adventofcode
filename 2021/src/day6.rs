@@ -12,10 +12,7 @@ pub fn solve(input_str: &str, days: usize) -> usize {
         .next()
         .unwrap()
         .split(",")
-        .map(|x| {
-            println!("'{}'", x);
-            x.parse::<usize>().unwrap()
-        })
+        .map(|x| x.parse::<usize>().unwrap())
         .collect();
 
     let mut deq: VecDeque<usize> = VecDeque::from(vec![0; 9]);
