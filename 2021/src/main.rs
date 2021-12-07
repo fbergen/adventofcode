@@ -28,11 +28,30 @@ macro_rules! aoc {
 }
 
 mod day1;
+mod day10;
+mod day11;
+mod day12;
+mod day13;
+mod day14;
+mod day15;
+mod day16;
+mod day17;
+mod day18;
+mod day19;
 mod day2;
+mod day20;
+mod day21;
+mod day22;
+mod day23;
+mod day24;
+mod day25;
 mod day3;
 mod day4;
 mod day5;
 mod day6;
+mod day7;
+mod day8;
+mod day9;
 
 aoc! {
     1 => day1,
@@ -40,5 +59,24 @@ aoc! {
     3 => day3,
     4 => day4,
     5 => day5,
-    6 => day6
+    6 => day6,
+    7 => day7,
+    8 => day8,
+    9 => day9,
+    10 => day10,
+    11 => day11,
+    12 => day12,
+    13=> day13,
+    14 => day14,
+    15 => day15,
+    16 => day16,
+    17 => day17,
+    18 => day18,
+    19 => day19,
+    20=> day20,
+    21=> day21,
+    22=> day22,
+    23=> day23,
+    24=> day24,
+    25=> day25
 }
