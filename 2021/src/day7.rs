@@ -20,18 +20,13 @@ pub fn solve_part_2(input_str: &str) -> isize {
         .map(|n| n.parse::<isize>().unwrap())
         .collect();
 
-    let mean = (pos.iter().sum::<isize>() as f32 / pos.len() as f32).floor() as isize;
-    (mean..=mean + 1)
-        .map(|i| {
-            pos.iter()
-                .map(|x| {
-                    let s = (x - i).abs();
-                    (s * (s + 1) / 2).abs()
-                })
-                .sum()
+    let mean = (pos.iter().sum::<isize>() as f32 / pos.len() as f32).round() as isize;
+    pos.iter()
+        .map(|x| {
+            let s = (x - mean).abs();
+            (s * (s + 1) / 2).abs()
         })
-        .min()
-        .unwrap()
+        .sum::<isize>()
 }
 
 #[cfg(test)]
