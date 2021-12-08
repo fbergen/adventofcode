@@ -51,30 +51,18 @@ pub fn solve_part_2(input_str: &str) -> usize {
 
             e.output
                 .iter()
-                .map(|o| {
-                    match o.len() {
-                        2 => 1,
-                        3 => 7,
-                        4 => 4,
-                        5 => {
-                            // 2,3 or 5
-                            match true {
-                                _ if overlap(o, seven) == 3 => 3,
-                                _ if overlap(o, four) == 2 => 2,
-                                _ => 5,
-                            }
-                        }
-                        6 => {
-                            // 0, 6 or 9
-                            match true {
-                                _ if overlap(o, four) == 4 => 9,
-                                _ if overlap(o, seven) == 3 => 0,
-                                _ => 6,
-                            }
-                        }
-                        7 => 8,
-                        _ => panic!(),
-                    }
+                .map(|o| match o.len() {
+                    2 => 1,
+                    3 => 7,
+                    4 => 4,
+                    5 if overlap(o, seven) == 3 => 3,
+                    5 if overlap(o, four) == 2 => 2,
+                    5 => 5,
+                    6 if overlap(o, four) == 4 => 9,
+                    6 if overlap(o, seven) == 3 => 0,
+                    6 => 6,
+                    7 => 8,
+                    _ => panic!(),
                 })
                 .fold(0, |acc, x| acc * 10 + x)
         })
