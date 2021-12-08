@@ -59,16 +59,16 @@ pub fn solve_part_2(input_str: &str) -> usize {
                         5 => {
                             // 2,3 or 5
                             match true {
-                                true if overlap(o, seven) == 3 => 3,
-                                true if overlap(o, four) == 2 => 2,
+                                _ if overlap(o, seven) == 3 => 3,
+                                _ if overlap(o, four) == 2 => 2,
                                 _ => 5,
                             }
                         }
                         6 => {
                             // 0, 6 or 9
                             match true {
-                                true if overlap(o, four) == 4 => 9,
-                                true if overlap(o, seven) == 3 => 0,
+                                _ if overlap(o, four) == 4 => 9,
+                                _ if overlap(o, seven) == 3 => 0,
                                 _ => 6,
                             }
                         }
