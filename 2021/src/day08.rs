@@ -4,49 +4,33 @@ struct Entry {
     output: Vec<String>,
 }
 
-fn sorted_str(s: &str) -> String {
-    let mut chars: Vec<char> = s.chars().collect();
-    chars.sort_by(|a, b| b.cmp(a));
-    String::from_iter(chars)
-}
-
-fn parse(input_str: &str) -> Vec<Entry> {
-    input_str
-        .lines()
-        .map(|l| {
-            let s = l.split_once(" | ").unwrap();
-            Entry {
-                signal: s.0.split(" ").map(|x| sorted_str(x)).collect(),
-                output: s.1.split(" ").map(|x| sorted_str(x)).collect(),
-            }
-        })
-        .collect()
+fn parse(input_str: &str) -> Box<dyn Iterator<Item = Entry> + '_> {
+    Box::new(input_str.lines().map(|l| {
+        let s = l.split_once(" | ").unwrap();
+        Entry {
+            signal: s.0.split(" ").map(|x| x.to_string()).collect(),
+            output: s.1.split(" ").map(|x| x.to_string()).collect(),
+        }
+    }))
 }
 
 pub fn solve_part_1(input_str: &str) -> usize {
-    let entries: Vec<Entry> = parse(input_str);
-
-    entries
-        .iter()
+    parse(input_str)
         .map(|e| {
             e.output
                 .iter()
-                .filter(|o| o.len() == 2 || o.len() == 3 || o.len() == 4 || o.len() == 7)
+                .filter(|o| [2, 3, 4, 7].contains(&o.len()))
                 .count()
         })
         .sum()
 }
 
-fn overlap(a: &String, b: &String) -> usize {
-    a.chars().filter(|c| b.contains(|x| x == *c)).count()
-}
 pub fn solve_part_2(input_str: &str) -> usize {
+    let overlap = |a: &String, b: &String| a.chars().filter(|c| b.contains(*c)).count();
     parse(input_str)
-        .iter()
         .map(|e| {
             let seven = e.signal.iter().find(|x| x.len() == 3).unwrap();
             let four = e.signal.iter().find(|x| x.len() == 4).unwrap();
-
             e.output
                 .iter()
                 .map(|o| match o.len() {
