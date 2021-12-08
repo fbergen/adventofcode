@@ -58,23 +58,23 @@ pub fn solve_part_2(input_str: &str) -> usize {
                         4 => 4,
                         5 => {
                             // 2,3 or 5
-                            let mut ret = 5;
                             if overlap(o, seven) == 3 {
-                                ret = 3;
+                                3
                             } else if overlap(o, four) == 2 {
-                                ret = 2;
+                                2
+                            } else {
+                                5
                             }
-                            ret
                         }
                         6 => {
-                            // 0, 6, 9
-                            let mut ret = 6;
+                            // 0, 6 or 9
                             if overlap(o, four) == 4 {
-                                ret = 9;
+                                9
                             } else if overlap(o, seven) == 3 {
-                                ret = 0;
+                                0
+                            } else {
+                                6
                             }
-                            ret
                         }
                         7 => 8,
                         _ => panic!(),
