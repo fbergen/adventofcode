@@ -41,9 +41,7 @@ fn overlap(a: &String, b: &String) -> usize {
     a.chars().filter(|c| b.contains(|x| x == *c)).count()
 }
 pub fn solve_part_2(input_str: &str) -> usize {
-    let entries: Vec<Entry> = parse(input_str);
-
-    entries
+    parse(input_str)
         .iter()
         .map(|e| {
             let seven = e.signal.iter().find(|x| x.len() == 3).unwrap();
