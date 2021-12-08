@@ -46,8 +46,8 @@ pub fn solve_part_2(input_str: &str) -> usize {
     entries
         .iter()
         .map(|e| {
-            let seven = e.signal.iter().filter(|x| x.len() == 3).next().unwrap();
-            let four = e.signal.iter().filter(|x| x.len() == 4).next().unwrap();
+            let seven = e.signal.iter().find(|x| x.len() == 3).unwrap();
+            let four = e.signal.iter().find(|x| x.len() == 4).unwrap();
 
             e.output
                 .iter()
@@ -58,22 +58,18 @@ pub fn solve_part_2(input_str: &str) -> usize {
                         4 => 4,
                         5 => {
                             // 2,3 or 5
-                            if overlap(o, seven) == 3 {
-                                3
-                            } else if overlap(o, four) == 2 {
-                                2
-                            } else {
-                                5
+                            match true {
+                                true if overlap(o, seven) == 3 => 3,
+                                true if overlap(o, four) == 2 => 2,
+                                _ => 5,
                             }
                         }
                         6 => {
                             // 0, 6 or 9
-                            if overlap(o, four) == 4 {
-                                9
-                            } else if overlap(o, seven) == 3 {
-                                0
-                            } else {
-                                6
+                            match true {
+                                true if overlap(o, four) == 4 => 9,
+                                true if overlap(o, seven) == 3 => 0,
+                                _ => 6,
                             }
                         }
                         7 => 8,
