@@ -1,22 +1,27 @@
 use itertools::Itertools;
-use std::collections::HashSet;
 
 type Board = Vec<Vec<u32>>;
 
 fn try_get(board: &Board, x: i32, y: i32) -> Option<&u32> {
     if x < 0 || y < 0 {
-        ()
+        return None;
     }
     board.get(x as usize)?.get(y as usize)
 }
 
-fn get_neighbours(board: &Board, x: i32, y: i32) -> Vec<((i32, i32), &u32)> {
-    [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
-        .into_iter()
-        .map(|(xx, yy)| ((xx, yy), try_get(&board, xx, yy)))
-        .filter(|(_point, val)| val.is_some())
-        .map(|(point, val)| (point, val.unwrap()))
-        .collect()
+fn get_neighbours(
+    board: &Board,
+    x: i32,
+    y: i32,
+) -> Box<dyn Iterator<Item = ((i32, i32), &u32)> + '_> {
+    const NEIGHBOURS: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+    Box::new(
+        NEIGHBOURS
+            .iter()
+            .map(move |(dx, dy)| ((x + dx, y + dy), try_get(&board, x + dx, y + dy)))
+            .filter(|(_point, val)| val.is_some())
+            .map(|(point, val)| (point, val.unwrap())),
+    )
 }
 
 fn get_low_points(board: &Board) -> Vec<(usize, usize)> {
@@ -24,32 +29,41 @@ fn get_low_points(board: &Board) -> Vec<(usize, usize)> {
         .map(|i| (0..board[0].len()).map(move |j| (i, j)))
         .flatten()
         .filter(|(i, j)| {
-            get_neighbours(board, *i as i32, *j as i32)
-                .iter()
-                .all(|(_point, val)| **val > board[*i][*j])
+            let curr = board[*i][*j];
+            get_neighbours(board, *i as i32, *j as i32).all(|(_point, val)| *val > curr)
         })
         .collect()
 }
 
 fn get_basin_size(board: &Board, x: usize, y: usize) -> usize {
-    let mut seen = HashSet::from([(x as i32, y as i32)]);
+    let insert = |seen: &mut [bool; 100 * 100], x: usize, y: usize| -> bool {
+        let idx = x + y * 100;
+        let s = !seen[idx];
+        seen[idx] = true;
+        s
+    };
+    let mut seen = [false; 100 * 100];
+    insert(&mut seen, x, y);
     let mut queue = vec![(x, y)];
+    queue.reserve(1000);
 
+    let mut cnt = 1;
     while queue.len() > 0 {
         let curr = queue.pop().unwrap();
         let curr_v = board[x][y];
 
-        get_neighbours(board, curr.0 as i32, curr.1 as i32)
-            .into_iter()
-            .filter(|(_p, v)| **v > curr_v && **v < 9)
-            .for_each(|(p, _)| {
-                if !seen.contains(&p) {
-                    queue.push((p.0 as usize, p.1 as usize));
-                    seen.insert(p);
-                }
-            });
+        queue.extend(
+            get_neighbours(board, curr.0 as i32, curr.1 as i32)
+                .filter(|(p, v)| {
+                    **v > curr_v && **v < 9 && insert(&mut seen, p.0 as usize, p.1 as usize)
+                })
+                .map(|(p, _)| {
+                    cnt += 1;
+                    (p.0 as usize, p.1 as usize)
+                }),
+        );
     }
-    seen.len()
+    cnt
 }
 
 pub fn solve_part_1(input_str: &str) -> u32 {
