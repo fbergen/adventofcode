@@ -10,3 +10,6 @@ recap = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 itertools = "0.10.1"
 
+[profile.release]
+debug = true
+
