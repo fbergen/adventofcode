@@ -8,7 +8,7 @@ macro_rules! aoc {
             }
 
             let problem_num: u32 = args[1].parse::<u32>().unwrap();
-            let iter: u32 = if args.len() >= 3 { args[2].parse::<u32>().unwrap() } else {1};
+            let iter: u128 = if args.len() >= 3 { args[2].parse().unwrap() } else {1};
 
             use std::time::Instant;
             match problem_num {
@@ -19,13 +19,13 @@ macro_rules! aoc {
                         for _ in 0..iter {
                             part1 = $module::solve_part_1(include_str!(concat!("inputs/day", $m)));
                         }
-                        println!("Part 1: {} ({}µs)", part1, start.elapsed().as_micros());
+                        println!("Part 1: {} ({}µs)", part1, start.elapsed().as_micros() / iter);
                         let start = Instant::now();
                         let mut part2 = 0;
                         for _ in 0..iter {
                             part2 = $module::solve_part_2(include_str!(concat!("inputs/day", $m)));
                         }
-                        println!("Part 2: {} ({}µs)", part2, start.elapsed().as_micros());
+                        println!("Part 2: {} ({}µs)", part2, start.elapsed().as_micros() / iter);
                     }
                 )*
                 _ => panic!("Unknown problem number")

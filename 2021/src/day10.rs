@@ -1,31 +1,29 @@
 use itertools::Itertools;
 
-pub fn solve_part_1(input_str: &str) -> usize {
-    let progs = input_str.lines().map(|l| l.chars());
+fn match_seq(s: &str) -> (Vec<char>, Option<char>) {
+    let mut exp = Vec::with_capacity(s.len());
 
-    let pushtrue = |exp: &mut Vec<char>, chr: char| {
-        exp.push(chr);
-        true
-    };
-    progs
-        .filter_map(|mut p| {
-            let mut exp = vec![];
-            let c = p.find(|chr| {
-                let accept = match chr {
-                    '(' => pushtrue(&mut exp, '('),
-                    '[' => pushtrue(&mut exp, '['),
-                    '{' => pushtrue(&mut exp, '{'),
-                    '<' => pushtrue(&mut exp, '<'),
-                    ')' if exp.pop().unwrap_or('x') == '(' => true,
-                    ']' if exp.pop().unwrap_or('x') == '[' => true,
-                    '}' if exp.pop().unwrap_or('x') == '{' => true,
-                    '>' if exp.pop().unwrap_or('x') == '<' => true,
-                    _ => false,
-                };
-                !accept
-            });
-            c
-        })
+    let c = s.chars().find(|chr| {
+        let accept = match chr {
+            '(' | '[' | '{' | '<' => {
+                exp.push(*chr);
+                true
+            }
+            ')' => exp.pop() == Some('('),
+            ']' => exp.pop() == Some('['),
+            '}' => exp.pop() == Some('{'),
+            '>' => exp.pop() == Some('<'),
+            _ => false,
+        };
+        !accept
+    });
+    (exp, c)
+}
+
+pub fn solve_part_1(input_str: &str) -> usize {
+    input_str
+        .lines()
+        .filter_map(|p| match_seq(p).1)
         .map(|chr| match chr {
             ')' => 3,
             ']' => 57,
@@ -36,33 +34,11 @@ pub fn solve_part_1(input_str: &str) -> usize {
         .sum()
 }
 pub fn solve_part_2(input_str: &str) -> usize {
-    let progs = input_str.lines().map(|l| l.chars());
-
-    let pushtrue = |exp: &mut Vec<char>, chr: char| {
-        exp.push(chr);
-        true
-    };
-    let scores: Vec<usize> = progs
-        .filter_map(|mut p| {
-            let mut exp = vec![];
-            let c = p.find(|chr| {
-                let accept = match chr {
-                    '(' => pushtrue(&mut exp, '('),
-                    '[' => pushtrue(&mut exp, '['),
-                    '{' => pushtrue(&mut exp, '{'),
-                    '<' => pushtrue(&mut exp, '<'),
-                    ')' if exp.pop().unwrap_or('x') == '(' => true,
-                    ']' if exp.pop().unwrap_or('x') == '[' => true,
-                    '}' if exp.pop().unwrap_or('x') == '{' => true,
-                    '>' if exp.pop().unwrap_or('x') == '<' => true,
-                    _ => false,
-                };
-                !accept
-            });
-            match c {
-                None => Some(exp),
-                _ => None,
-            }
+    let scores: Vec<usize> = input_str
+        .lines()
+        .filter_map(|p| match match_seq(p) {
+            (x, None) => Some(x),
+            _ => None,
         })
         .map(|exp| {
             exp.iter().rev().fold(0, |acc, chr| {
