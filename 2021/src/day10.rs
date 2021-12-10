@@ -1,4 +1,5 @@
 use itertools::Itertools;
+
 pub fn solve_part_1(input_str: &str) -> usize {
     let progs = input_str.lines().map(|l| l.chars());
 
@@ -15,27 +16,22 @@ pub fn solve_part_1(input_str: &str) -> usize {
                     '[' => pushtrue(&mut exp, '['),
                     '{' => pushtrue(&mut exp, '{'),
                     '<' => pushtrue(&mut exp, '<'),
-                    ')' if exp.pop().unwrap_or('(') == '(' => true,
-                    ']' if exp.pop().unwrap_or('[') == '[' => true,
-                    '}' if exp.pop().unwrap_or('{') == '{' => true,
-                    '>' if exp.pop().unwrap_or('<') == '<' => true,
+                    ')' if exp.pop().unwrap_or('x') == '(' => true,
+                    ']' if exp.pop().unwrap_or('x') == '[' => true,
+                    '}' if exp.pop().unwrap_or('x') == '{' => true,
+                    '>' if exp.pop().unwrap_or('x') == '<' => true,
                     _ => false,
                 };
                 !accept
             });
             c
         })
-        .sorted()
-        .dedup_with_count()
-        .map(|(count, chr)| {
-            let points = match chr {
-                ')' => 3,
-                ']' => 57,
-                '}' => 1197,
-                '>' => 25137,
-                _ => panic!(),
-            };
-            points * count
+        .map(|chr| match chr {
+            ')' => 3,
+            ']' => 57,
+            '}' => 1197,
+            '>' => 25137,
+            _ => panic!(),
         })
         .sum()
 }
@@ -55,10 +51,10 @@ pub fn solve_part_2(input_str: &str) -> usize {
                     '[' => pushtrue(&mut exp, '['),
                     '{' => pushtrue(&mut exp, '{'),
                     '<' => pushtrue(&mut exp, '<'),
-                    ')' if exp.pop().unwrap_or('(') == '(' => true,
-                    ']' if exp.pop().unwrap_or('[') == '[' => true,
-                    '}' if exp.pop().unwrap_or('{') == '{' => true,
-                    '>' if exp.pop().unwrap_or('<') == '<' => true,
+                    ')' if exp.pop().unwrap_or('x') == '(' => true,
+                    ']' if exp.pop().unwrap_or('x') == '[' => true,
+                    '}' if exp.pop().unwrap_or('x') == '{' => true,
+                    '>' if exp.pop().unwrap_or('x') == '<' => true,
                     _ => false,
                 };
                 !accept
