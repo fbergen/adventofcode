@@ -10,6 +10,9 @@ recap = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 itertools = "0.10.1"
 hashbrown = "0.11"
+lazy_static = "1.4.0"
+dhat = "0.2.4"
+
 
 [profile.release]
 debug = true

@@ -1,7 +1,7 @@
 type Grid = Vec<u32>;
 const SIZE: usize = 10;
 
-fn get_neighbours<'a>(p: &'a (i32, i32)) -> Box<dyn Iterator<Item = (i32, i32)> + 'a> {
+fn get_neighbours<'a>(p: &'a (i32, i32)) -> Box<dyn Iterator<Item = usize> + 'a> {
     const NEIGHBOURS: [(i32, i32); 8] = [
         (-1, -1),
         (-1, 0),
@@ -16,41 +16,47 @@ fn get_neighbours<'a>(p: &'a (i32, i32)) -> Box<dyn Iterator<Item = (i32, i32)> 
         NEIGHBOURS
             .iter()
             .map(move |(dx, dy)| (p.0 + dx, p.1 + dy))
-            .filter(|(x, y)| *x >= 0 && *x < SIZE as i32 && *y >= 0 && *y < SIZE as i32),
+            .filter(|(x, y)| *x >= 0 && *x < SIZE as i32 && *y >= 0 && *y < SIZE as i32)
+            .map(|p| p.0 as usize + p.1 as usize * SIZE),
     )
-}
-
-fn update_neighbours(grid: &mut Grid, p: &(i32, i32), flashed: &mut Vec<bool>) -> bool {
-    let idx = p.0 as usize + p.1 as usize * SIZE;
-    if grid[idx] > 9 && !flashed[idx] {
-        flashed[idx] = true;
-        get_neighbours(&p).for_each(|p| {
-            let idx = p.0 as usize + p.1 as usize * SIZE;
-            grid[idx] += 1;
-        });
-        return true;
-    }
-    false
 }
 
 fn iter(grid: &mut Grid) -> usize {
     grid.iter_mut().for_each(|i| *i += 1);
 
     let mut flashed: Vec<bool> = vec![false; SIZE * SIZE];
-    let mut updated = true;
-    let mut count = 0;
-    while updated {
-        updated = false;
 
-        for x in 0..SIZE {
-            for y in 0..SIZE {
-                let p = (x as i32, y as i32);
-                if update_neighbours(grid, &p, &mut flashed) {
-                    updated = true;
-                    count += 1;
-                }
+    let mut queue: Vec<usize> = grid
+        .iter()
+        .enumerate()
+        .filter_map(|(i, x)| match *x > 9 {
+            true => {
+                flashed[i] = true;
+                Some(i)
             }
-        }
+            false => None,
+        })
+        .collect();
+    queue.reserve(SIZE * SIZE);
+
+    let mut count = 0;
+    while let Some(idx) = queue.pop() {
+        count += 1;
+        queue.extend(
+            get_neighbours(&((idx % SIZE) as i32, (idx / SIZE) as i32)).filter(|&idx| {
+                let e = &mut grid[idx];
+                *e += 1;
+
+                // flashed[idx] = true;
+                match *e > 9 && !flashed[idx] {
+                    true => {
+                        flashed[idx] = true;
+                        true
+                    }
+                    false => false,
+                }
+            }),
+        );
     }
     grid.iter_mut().for_each(|val| {
         if *val > 9 {
