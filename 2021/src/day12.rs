@@ -1,3 +1,4 @@
+use hashbrown::HashMap;
 use itertools::Itertools;
 use recap::Recap;
 use serde::Deserialize;
@@ -9,8 +10,12 @@ pub struct Links {
     to: String,
 }
 
+type BitArr = u64;
+type Cache = HashMap<(BitArr, bool, usize), usize>;
 type AdjList = Vec<Vec<(bool, usize)>>;
+
 struct Params {
+    part1: bool,
     adj_list: AdjList,
     start_id: usize,
     end_id: usize,
@@ -19,6 +24,8 @@ struct Params {
 
 fn parse(input_str: &str) -> Params {
     let is_upper = |s: &String| -> bool { s.to_ascii_uppercase() == *s };
+    let get_id =
+        |s: &String, str_id: &Vec<String>| -> usize { str_id.iter().position(|x| x == s).unwrap() };
 
     let str_ids: Vec<String> = input_str
         .lines()
@@ -27,21 +34,19 @@ fn parse(input_str: &str) -> Params {
         .flatten()
         .unique()
         .collect();
-    let get_id =
-        |s: &String, str_id: &Vec<String>| -> usize { str_id.iter().position(|x| x == s).unwrap() };
-
     let mut adj_list: AdjList = vec![vec![]; str_ids.len()];
-    let links: Vec<Links> = input_str
+    input_str
         .lines()
         .map(|l| l.parse::<Links>().unwrap())
-        .collect();
-
-    links.iter().for_each(|l| {
-        adj_list[get_id(&l.from, &str_ids)].push((is_upper(&l.to), get_id(&l.to, &str_ids)));
-        adj_list[get_id(&l.to, &str_ids)].push((is_upper(&l.from), get_id(&l.from, &str_ids)));
-    });
+        .for_each(|l| {
+            let from_id = get_id(&l.from, &str_ids);
+            let to_id = get_id(&l.to, &str_ids);
+            adj_list[from_id].push((is_upper(&l.to), to_id));
+            adj_list[to_id].push((is_upper(&l.from), from_id));
+        });
 
     Params {
+        part1: true,
         adj_list: adj_list,
         start_id: get_id(&"start".to_string(), &str_ids),
         end_id: get_id(&"end".to_string(), &str_ids),
@@ -49,27 +54,30 @@ fn parse(input_str: &str) -> Params {
     }
 }
 
-fn dfs(part1: bool, params: &Params, last: usize, seen: &mut Vec<bool>, has_dupes: bool) -> usize {
-    if last == params.end_id {
-        return 1;
-    }
+fn dfs(params: &Params, last: usize, seen: BitArr, has_dupes: bool, cache: &mut Cache) -> usize {
+    let cache_key = (seen, has_dupes, last);
+    if let Some(num_paths) = cache.get(&cache_key) {
+        return *num_paths;
+    } else {
+        if last == params.end_id {
+            return 1;
+        }
 
-    let mut num_paths = 0;
-    params.adj_list[last].iter().for_each(|(is_upper, n)| {
-        if *n != params.start_id {
-            let contains_n = seen[*n];
-            let next_has_dupes = has_dupes || (!*is_upper && contains_n);
+        let mut num_paths = 0;
+        params.adj_list[last].iter().for_each(|(is_upper, n)| {
+            if *n != params.start_id {
+                let contains_n = seen & (1 << *n) != 0;
+                let next_has_dupes = has_dupes || (!*is_upper && contains_n);
 
-            if *is_upper || !contains_n || (!part1 && !has_dupes) {
-                seen[*n] = true;
-                num_paths += dfs(part1, params, *n, seen, next_has_dupes);
-                if !contains_n {
-                    seen[*n] = false;
+                if *is_upper || !contains_n || (!params.part1 && !has_dupes) {
+                    num_paths += dfs(params, *n, seen | (1 << *n), next_has_dupes, cache);
                 }
             }
-        }
-    });
-    num_paths
+        });
+
+        cache.insert(cache_key, num_paths);
+        num_paths
+    }
 }
 pub fn solve_part_1(input_str: &str) -> usize {
     solve(input_str, true)
@@ -80,10 +88,13 @@ pub fn solve_part_2(input_str: &str) -> usize {
 }
 
 fn solve(input_str: &str, part1: bool) -> usize {
-    let params = parse(input_str);
+    let mut params = parse(input_str);
+    params.part1 = part1;
     let mut seen = vec![false; params.size];
     seen[params.start_id] = true;
-    dfs(part1, &params, params.start_id, &mut seen, false)
+
+    let mut cache: Cache = HashMap::new();
+    dfs(&params, params.start_id, 0, false, &mut cache)
 }
 
 #[cfg(test)]
