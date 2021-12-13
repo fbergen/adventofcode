@@ -82,7 +82,7 @@ pub fn solve_part_2(input_str: &str) -> usize {
 fn solve(input_str: &str, part1: bool) -> usize {
     let params = parse(input_str);
     let mut seen = vec![false; params.size];
-    seen[params.start_id] = true;_id
+    seen[params.start_id] = true;
     dfs(part1, &params, params.start_id, &mut seen, false)
 }
 
