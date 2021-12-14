@@ -32,14 +32,9 @@ fn get_at_depth(
     if depth == 0 {
         return HashMap::from_iter([(a, 1)]);
     } else {
-        let mut map: Map = HashMap::new();
         let ins = ins_rules[&(a, b)];
 
-        get_at_depth_cache(ins_rules, a, ins, depth - 1, cache)
-            .iter()
-            .for_each(|(k, v)| {
-                map.entry(*k).and_modify(|e| *e += v).or_insert(*v);
-            });
+        let mut map: Map = get_at_depth_cache(ins_rules, a, ins, depth - 1, cache);
         get_at_depth_cache(ins_rules, ins, b, depth - 1, cache)
             .iter()
             .for_each(|(k, v)| {
