@@ -43,10 +43,8 @@ pub fn solve_part_1(input_str: &str) -> usize {
             grid[idx] += min(grid[idx + 1], grid[idx + size]);
         }
     }
-    grid[0] - start;
-
     print(&grid);
-    0
+    grid[0] - start
 }
 pub fn solve_part_2(_input_str: &str) -> usize {
     0
