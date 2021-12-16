@@ -1,20 +1,34 @@
-type Grid = Vec<usize>;
-use std::cmp::min;
+use std::cmp::Reverse;
+use std::collections::BinaryHeap;
+use std::iter::repeat;
 
-fn parse(input_str: &str) -> Grid {
-    input_str
+type Grid = Vec<usize>;
+
+fn parse(input_str: &str, nrepeat: usize) -> Grid {
+    let g1: Vec<usize> = input_str
         .lines()
-        .flat_map(|l| l.chars())
-        .map(|c| c.to_digit(10).unwrap() as usize)
+        .flat_map(|l| {
+            repeat(l.chars())
+                .take(nrepeat)
+                .enumerate()
+                .flat_map(|(i, iter)| iter.map(move |e| (e.to_digit(10).unwrap() as usize + i)))
+        })
+        .collect();
+    repeat(g1)
+        .take(nrepeat)
+        .enumerate()
+        .flat_map(|(i, vec)| vec.iter().map(move |e| e + i).collect::<Vec<usize>>())
+        .map(|i| if i > 9 { i - 9 } else { i })
         .collect()
 }
 
-pub fn print(grid: &Grid) {
+pub fn _print(grid: &Grid) {
     let size = (grid.len() as f64).sqrt().round() as usize;
     for j in 0..size {
         for i in 0..size {
             let idx = i + j * size;
             print!("{:>4}", grid[idx]);
+            // print!("{:}", grid[idx]);
         }
         println!("");
     }
@@ -22,32 +36,51 @@ pub fn print(grid: &Grid) {
     println!("");
 }
 
-pub fn solve_part_1(input_str: &str) -> usize {
-    let mut grid = parse(input_str);
+fn get_neighbours(pos: usize, size: usize) -> Box<dyn Iterator<Item = usize>> {
+    let (i, j) = ((pos % size) as i32, (pos / size) as i32);
+    const NEIGHBOURS: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+    Box::new(
+        NEIGHBOURS
+            .iter()
+            .map(move |(dx, dy)| (i + dx, j + dy))
+            .filter(move |(x, y)| *x >= 0 && *x < size as i32 && *y >= 0 && *y < size as i32)
+            .map(move |p| p.0 as usize + p.1 as usize * size),
+    )
+}
+
+fn shortest_path(grid: &Grid, start: usize) -> usize {
     let size = (grid.len() as f64).sqrt().round() as usize;
 
-    let start = grid[0];
-    print(&grid);
-    for i in (0..size - 1).rev() {
-        let idx = i + size * (size - 1);
-        grid[idx] += grid[idx + 1];
-    }
-    for j in (0..size - 1).rev() {
-        let idx = size - 1 + size * j;
-        grid[idx] += grid[idx + size];
-    }
-    print(&grid);
-    for i in (0..size - 1).rev() {
-        for j in (0..size - 1).rev() {
-            let idx = i + j * size;
-            grid[idx] += min(grid[idx + 1], grid[idx + size]);
+    let mut min_risk: Grid = vec![usize::MAX; grid.len()];
+    let mut heap = BinaryHeap::new();
+
+    min_risk[start] = 0;
+    heap.push((Reverse(0), start));
+
+    while let Some((Reverse(risk), pos)) = heap.pop() {
+        if pos == (size * size - 1) {
+            return risk;
+        }
+
+        for n_pos in get_neighbours(pos, size) {
+            let n_risk = risk + grid[n_pos];
+
+            if n_risk < min_risk[n_pos] {
+                heap.push((Reverse(n_risk), n_pos));
+                min_risk[n_pos] = n_risk;
+            }
         }
     }
-    print(&grid);
-    grid[0] - start
-}
-pub fn solve_part_2(_input_str: &str) -> usize {
     0
+}
+
+pub fn solve_part_1(input_str: &str) -> usize {
+    let grid = parse(input_str, 1);
+    shortest_path(&grid, 0)
+}
+pub fn solve_part_2(input_str: &str) -> usize {
+    let grid = parse(input_str, 5);
+    shortest_path(&grid, 0)
 }
 
 #[cfg(test)]
@@ -74,6 +107,7 @@ mod test {
     #[test]
     fn test2() {
         let res = super::solve_part_2(TESTCASE);
-        assert_eq!(res, 0);
+        assert_eq!(res, 315);
+        // assert_eq!(res, 314);
     }
 }
