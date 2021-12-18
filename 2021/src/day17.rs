@@ -51,24 +51,27 @@ fn hit_steps_y(yv: i32, t: &TargetArea) -> Option<(i32, i32)> {
     }
 }
 
-pub fn solve_part_2(input_str: &str) -> usize {
-    let t = input_str.parse::<TargetArea>().unwrap();
+// For each x and y-velocity, compute the number of steps (range) at which the projectile is within
+// the Target area.
+fn build_step_vecs(t: &TargetArea) -> (Vec<(i32, (i32, i32))>, Vec<(i32, (i32, i32))>) {
     let xv_min = (((t.x0 * 8 + 1) as f64).sqrt() / 2.0 - 0.5).ceil() as i32;
     let yv_max = (t.y0 + 1).abs();
+    let xvs = (xv_min..=t.x1)
+        .filter_map(|i| hit_steps_x(i, &t).map(|x| (i, x)))
+        .collect();
+    let yvs = (t.y0..=yv_max)
+        .filter_map(|i| hit_steps_y(i, &t).map(|x| (i, x)))
+        .collect();
 
-    let mut xvs = vec![];
-    for i in xv_min..=t.x1 {
-        if let Some((start, end)) = hit_steps_x(i, &t) {
-            xvs.push((i, (start, end)));
-        }
-    }
+    (xvs, yvs)
+}
 
-    let mut yvs = vec![];
-    for i in t.y0..=yv_max {
-        if let Some((start, end)) = hit_steps_y(i, &t) {
-            yvs.push((i, (start, end)));
-        }
-    }
+pub fn solve_part_2(input_str: &str) -> usize {
+    let t = input_str.parse::<TargetArea>().unwrap();
+
+    let (xvs, yvs) = build_step_vecs(&t);
+
+    // count xs and ys that are "overlapping" in number of steps.
     let mut num = 0;
     for xv in &xvs {
         for yv in &yvs {
