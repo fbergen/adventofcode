@@ -53,16 +53,11 @@ fn hit_steps_y(yv: i32, t: &TargetArea) -> Option<(i32, i32)> {
 
 // For each x and y-velocity, compute the number of steps (range) at which the projectile is within
 // the Target area.
-fn build_step_vecs(t: &TargetArea) -> (Vec<(i32, (i32, i32))>, Vec<(i32, (i32, i32))>) {
+fn build_step_vecs(t: &TargetArea) -> (Vec<(i32, i32)>, Vec<(i32, i32)>) {
     let xv_min = (((t.x0 * 8 + 1) as f64).sqrt() / 2.0 - 0.5).ceil() as i32;
     let yv_max = (t.y0 + 1).abs();
-    let xvs = (xv_min..=t.x1)
-        .filter_map(|i| hit_steps_x(i, &t).map(|x| (i, x)))
-        .collect();
-    let yvs = (t.y0..=yv_max)
-        .filter_map(|i| hit_steps_y(i, &t).map(|x| (i, x)))
-        .collect();
-
+    let xvs = (xv_min..=t.x1).filter_map(|i| hit_steps_x(i, &t)).collect();
+    let yvs = (t.y0..=yv_max).filter_map(|i| hit_steps_y(i, &t)).collect();
     (xvs, yvs)
 }
 
@@ -75,8 +70,8 @@ pub fn solve_part_2(input_str: &str) -> usize {
     let mut num = 0;
     for xv in &xvs {
         for yv in &yvs {
-            let max_start = max(xv.1 .0, yv.1 .0);
-            let min_end = min(xv.1 .1, yv.1 .1);
+            let max_start = max(xv.0, yv.0);
+            let min_end = min(xv.1, yv.1);
             if max_start <= min_end {
                 num += 1;
             }
