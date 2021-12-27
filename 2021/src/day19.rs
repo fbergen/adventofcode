@@ -23,7 +23,7 @@ fn parse(input: &str) -> Vec<ScannerReport> {
         .collect();
 }
 
-const rotations: [[[i32; 3]; 3]; 24] = [
+const ROTATIONS: [[[i32; 3]; 3]; 24] = [
     [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
     [[1, 0, 0], [0, 0, -1], [0, 1, 0]],
     [[1, 0, 0], [0, -1, 0], [0, 0, -1]],
@@ -51,7 +51,7 @@ const rotations: [[[i32; 3]; 3]; 24] = [
 ];
 
 pub fn rot(p: &Point, i: usize) -> Point {
-    let r = rotations[i];
+    let r = ROTATIONS[i];
     (
         r[0][0] * p.0 + r[0][1] * p.1 + r[0][2] * p.2,
         r[1][0] * p.0 + r[1][1] * p.1 + r[1][2] * p.2,
@@ -64,7 +64,7 @@ pub fn sub(a: &Point, b: &Point) -> Point {
 }
 
 pub fn match_points(det_points: &mut HashSet<Point>, report: &ScannerReport) -> Option<Point> {
-    for rotation in 0..rotations.len() {
+    for rotation in 0..ROTATIONS.len() {
         for point in report {
             let rot_point = rot(&point, rotation);
             for curr_beacon_point in det_points.iter() {
