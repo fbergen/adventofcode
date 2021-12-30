@@ -13,7 +13,7 @@ fn to_num<'a>(v: impl Iterator<Item = u64>) -> u64 {
     v.fold(0, |acc, x| acc * 2 + x)
 }
 
-fn parse_packet(iter: &mut std::vec::IntoIter<u64>, part2: bool) -> (u64, u64, u64) {
+fn parse_packet(iter: &mut std::vec::IntoIter<u64>) -> (u64, u64, u64) {
     let mut consumed = 0;
     let num;
     let mut version = to_num(iter.by_ref().take(3));
@@ -35,7 +35,7 @@ fn parse_packet(iter: &mut std::vec::IntoIter<u64>, part2: bool) -> (u64, u64, u
             let mut sub_len = to_num(iter.by_ref().take(15));
             consumed += 16 + sub_len;
             while sub_len > 0 {
-                let (cons, vers, ret) = parse_packet(iter.by_ref(), part2);
+                let (cons, vers, ret) = parse_packet(iter.by_ref());
                 rets.push(ret);
                 version += vers;
                 sub_len -= cons;
@@ -44,7 +44,7 @@ fn parse_packet(iter: &mut std::vec::IntoIter<u64>, part2: bool) -> (u64, u64, u
             let num_sub = to_num(iter.by_ref().take(11));
             consumed += 12;
             for _ in 0..num_sub {
-                let (cons, vers, ret) = parse_packet(iter.by_ref(), part2);
+                let (cons, vers, ret) = parse_packet(iter.by_ref());
                 rets.push(ret);
                 version += vers;
                 consumed += cons;
@@ -66,12 +66,12 @@ fn parse_packet(iter: &mut std::vec::IntoIter<u64>, part2: bool) -> (u64, u64, u
 
 pub fn solve_part_1(input_str: &str) -> u64 {
     let prog = parse_inp(input_str);
-    parse_packet(&mut prog.into_iter(), false).1
+    parse_packet(&mut prog.into_iter()).1
 }
 
 pub fn solve_part_2(input_str: &str) -> u64 {
     let prog = parse_inp(input_str);
-    parse_packet(&mut prog.into_iter(), true).2
+    parse_packet(&mut prog.into_iter()).2
 }
 
 #[cfg(test)]
