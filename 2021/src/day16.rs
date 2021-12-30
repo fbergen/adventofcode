@@ -34,6 +34,14 @@ fn to_num<'a>(v: impl Iterator<Item = u64>) -> u64 {
     v.fold(0, |acc, x| acc * 2 + x)
 }
 
+fn bool_to_u64(b: bool) -> u64 {
+    if b {
+        1
+    } else {
+        0
+    }
+}
+
 fn parse_packet(iter: &mut std::vec::IntoIter<u64>, part2: bool) -> (u64, u64, u64) {
     let mut consumed = 0;
     let num;
@@ -76,27 +84,9 @@ fn parse_packet(iter: &mut std::vec::IntoIter<u64>, part2: bool) -> (u64, u64, u
             1 => rets.iter().product(),
             2 => *rets.iter().min().unwrap(),
             3 => *rets.iter().max().unwrap(),
-            5 => {
-                if rets[0] > rets[1] {
-                    1
-                } else {
-                    0
-                }
-            }
-            6 => {
-                if rets[0] < rets[1] {
-                    1
-                } else {
-                    0
-                }
-            }
-            7 => {
-                if rets[0] == rets[1] {
-                    1
-                } else {
-                    0
-                }
-            }
+            5 => bool_to_u64(rets[0] > rets[1]),
+            6 => bool_to_u64(rets[0] < rets[1]),
+            7 => bool_to_u64(rets[0] == rets[1]),
             _ => panic!(),
         };
     }
