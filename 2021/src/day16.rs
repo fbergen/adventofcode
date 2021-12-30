@@ -14,18 +14,17 @@ fn to_num<'a>(v: impl Iterator<Item = u64>) -> u64 {
 }
 
 fn parse_packet(iter: &mut std::vec::IntoIter<u64>) -> (u64, u64, u64) {
-    let mut consumed = 0;
     let num;
     let mut version = to_num(iter.by_ref().take(3));
     let type_id = to_num(iter.by_ref().take(3));
-    consumed += 6;
+    let mut consumed = 6;
     if type_id == 4 {
         let mut val: Vec<u64> = vec![];
         while to_num(iter.by_ref().take(1)) == 1 {
-            val.extend(iter.by_ref().take(4).map(|c| c));
+            val.extend(iter.by_ref().take(4));
             consumed += 5;
         }
-        val.extend(iter.by_ref().take(4).map(|c| c));
+        val.extend(iter.by_ref().take(4));
         consumed += 5;
         num = to_num(val.into_iter());
     } else {
