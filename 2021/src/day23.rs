@@ -48,11 +48,10 @@ pub fn parse(input_str: &str, part2: bool) -> (Game, State) {
 }
 
 fn all_moves(state: &State, game: &Game, pos: &Index) -> Vec<Index> {
-    let mut queue = vec![];
-    queue.push(*pos);
+    let mut queue = vec![*pos];
     let mut seen = HashSet::new();
+    seen.insert(*pos);
     while let Some(next) = queue.pop() {
-        seen.insert(next);
         get_neighbours_4(&next)
             .filter(|p| *game.get(p).unwrap_or(&'#') == '.' && state.iter().all(|(sp, _)| sp != p))
             .for_each(|n| {
@@ -70,22 +69,17 @@ fn possible_moves(idx: usize, state: &State, game: &Game) -> Vec<Index> {
     if is_done(&state[idx], state, game) {
         return vec![];
     }
-    let moves = all_moves(state, game, &pos);
+    let mut moves = all_moves(state, game, &pos);
 
     if pos.1 == 1 {
         // in corridor, can only go back to a done position
-        return moves
-            .iter()
-            .filter(|&&p| is_done(&(p, val), state, game))
-            .map(|p| *p)
-            .collect();
+        moves.retain(|&p| is_done(&(p, val), state, game));
+        return moves;
     }
 
     // Not in corridor, add corridor positions
-    moves
-        .into_iter()
-        .filter(|p| p.1 == 1 && p.0 != 3 && p.0 != 5 && p.0 != 7 && p.0 != 9)
-        .collect()
+    moves.retain(|p| p.1 == 1 && ![3, 5, 7, 9].contains(&p.0));
+    return moves;
 }
 
 fn make_move(idx: usize, to: &Index, state: &mut State) {
@@ -103,13 +97,11 @@ fn get_cost_for_move(from: &Index, to: &Index, c: char) -> usize {
         }) as usize
 }
 
-fn next_games(game: &Game, state: &State) -> Vec<(usize, State)> {
+fn next_states(game: &Game, state: &State) -> Vec<(usize, State)> {
     let mut ret = vec![];
 
-    // print_game(game, state);
     for i in (0..state.len()).rev() {
         let moves = possible_moves(i, state, game);
-        // println!("{} => {:?} = {}", state[i].1, moves, is_done(i, state),);
         for m in &moves {
             let mut new_state = state.clone();
             make_move(i, m, &mut new_state);
@@ -160,7 +152,7 @@ fn dijkstra(game: &Game, state: &State) -> usize {
             return cost;
         }
 
-        for (n_cost, n_state) in next_games(game, &curr_state) {
+        for (n_cost, n_state) in next_states(game, &curr_state) {
             let n_cost = cost + n_cost;
 
             if n_cost < *min_cost.get(&n_state).unwrap_or(&usize::MAX) {
@@ -172,6 +164,7 @@ fn dijkstra(game: &Game, state: &State) -> usize {
     0
 }
 
+#[allow(dead_code)]
 fn print_game(a: &Game, state: &State) {
     let state_map: HashMap<Index, Val> = state.iter().map(|(p, v)| (*p, *v)).collect();
     let minx = *a.iter().map(|((x, _y), _v)| x).min().unwrap();
