@@ -1,10 +1,11 @@
+#![allow(unused_imports)]
+use aoc2021::print_2d_map;
+
 use hashbrown::HashMap;
 
 type Index = (i32, i32);
 type Val = char;
 type Map = HashMap<(i32, i32), char>;
-
-use aoc2021::print_2d_map;
 
 fn parse(input: &str) -> Map {
     input
