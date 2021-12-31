@@ -15,35 +15,35 @@ fn to_num<'a>(v: impl Iterator<Item = u64>) -> u64 {
 
 fn parse_packet(iter: &mut std::vec::IntoIter<u64>) -> (u64, u64, u64) {
     let num;
-    let mut version = to_num(iter.by_ref().take(3));
-    let type_id = to_num(iter.by_ref().take(3));
+    let mut version = to_num(iter.take(3));
+    let type_id = to_num(iter.take(3));
     let mut consumed = 6;
     if type_id == 4 {
         let mut val: Vec<u64> = vec![];
-        while to_num(iter.by_ref().take(1)) == 1 {
-            val.extend(iter.by_ref().take(4));
+        while to_num(iter.take(1)) == 1 {
+            val.extend(iter.take(4));
             consumed += 5;
         }
-        val.extend(iter.by_ref().take(4));
+        val.extend(iter.take(4));
         consumed += 5;
         num = to_num(val.into_iter());
     } else {
         // operator
         let mut rets = vec![];
-        if to_num(iter.by_ref().take(1)) == 0 {
-            let mut sub_len = to_num(iter.by_ref().take(15));
+        if to_num(iter.take(1)) == 0 {
+            let mut sub_len = to_num(iter.take(15));
             consumed += 16 + sub_len;
             while sub_len > 0 {
-                let (cons, vers, ret) = parse_packet(iter.by_ref());
+                let (cons, vers, ret) = parse_packet(iter);
                 rets.push(ret);
                 version += vers;
                 sub_len -= cons;
             }
         } else {
-            let num_sub = to_num(iter.by_ref().take(11));
+            let num_sub = to_num(iter.take(11));
             consumed += 12;
             for _ in 0..num_sub {
-                let (cons, vers, ret) = parse_packet(iter.by_ref());
+                let (cons, vers, ret) = parse_packet(iter);
                 rets.push(ret);
                 version += vers;
                 consumed += cons;
